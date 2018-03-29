@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Thu Feb 15 00:37:02 2018
-OBJECTIVE: DRUG VECTOR APPLICATION ON three FAULTS
+OBJECTIVE: DRUG VECTOR APPLICATION ON THREE FAULTS
 @author: arghanandan
 """
 
@@ -19,7 +19,7 @@ start_time=time.clock()
 plt.style.use("ggplot")
 pd.set_option("display.max_columns",None)
 pd.set_option("display.max_rows",None)
-        
+
 #reading protein file
 df_gene=pd.read_csv("ins/gene.csv",
                 delimiter=",",
@@ -73,7 +73,7 @@ while True:
     if drugv==False:
         break
     m=m+1
-    
+
 #output_drugthree.to_csv("outs/output_drugthree.csv")
-      
+
 print("Execution time: ","%0.3f"%(time.clock()-start_time)," seconds")

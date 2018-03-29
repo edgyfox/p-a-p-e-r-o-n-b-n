@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Tue Mar 26 01:20:56 2018
+Created on Tue Mar 13 13:29:21 2018
 
 @author: arghanandan
 """
@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 import condenser as cond
 plt.style.use("bmh")
 
-ifile="outs/output_drugone.csv"
+ifile="outs/output_custom1.csv"
 df_drugone=pd.read_csv(ifile,index_col=0)
 
 col_df=len(df_drugone.columns[1:])
@@ -34,7 +34,7 @@ plt.show()
 df_con=pd.DataFrame(columns=["drug vector","condensed weight"])
 df_con.iloc[:,0]=df_drugone.iloc[:,0]
 df_con=cond.condense(df_con,df_drugone,1)
-ofile="outs/output_one_weight.csv"
+ofile="outs/output_custom_weight.csv"
 df_con.to_csv(ofile)
 df_con=pd.read_csv(ofile,index_col=0)
 

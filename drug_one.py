@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Thu Jan 18 21:11:14 2018
+Created on Tue Mar 26 01:23:56 2018
 OBJECTIVE: DRUG VECTOR APPLICATION ON SINGLE FAULT
 @author: arghanandan
 """
@@ -21,49 +21,47 @@ pd.set_option("display.max_columns",None)
 pd.set_option("display.max_rows",None)
         
 #reading protein file
-df_gene=pd.read_csv("ins/gene.csv",
-                delimiter=",",
-                index_col=0,
-                header=None)
-df_gene.columns=["Proteins"]
-df_gene["Values"]=[0] * len(df_gene.index)
-
-#pathway and output dataframes
-out=pd.DataFrame(df_gene.iloc[28:,:]).reset_index()
-path=pd.DataFrame(df_gene.iloc[5:28,:]).reset_index()
+inp=pd.read_csv("ins/inp.csv",delimiter=",",index_col=0)
+path=pd.read_csv("ins/path.csv",delimiter=",",index_col=0)
+out=pd.read_csv("ins/out.csv",delimiter=",",index_col=0)
+inp["values"]=[0]*len(inp.index)
+path["values"]=[0]*len(path.index)
+out["values"]=[0]*len(out.index)
 
 #input,pathway and output vectors
 f=open("outs/output_unq.txt","r")
 unq=f.readline()
-unq=unq.split(" ")
-inpv=list(map(int,unq))
-pathv=list(path["Values"])
-outv=list(out["Values"])
+unq=list(map(int,unq.split(" ")))
+inpv=unq
+pathv=list(path["values"])
+outv=list(out["values"])
 
 #reading drug file
 df_drug=pd.read_csv("ins/drug.csv",header=None)
-df_drug.columns=["Drugs"]
-df_drug["Values"]=[0] * len(df_drug.index)
+df_drug.columns=["drugs"]
+df_drug["values"]=[0] * len(df_drug.index)
 
-drugv=list(df_drug["Values"])
+drugv=list(df_drug["values"])
 
 #creating output file
-cols=["Drug Vector"] + [i for i in range(25)]
+cols=["drug vector"] + [i for i in range(28)]
 output_drugone=pd.DataFrame(columns=cols)
 
 j=0
 while True:
     encoded=[]
-    for i in range(25):
+    for i in range(28):
         drugpath.pathway([i],drugv,inpv,pathv,outv)
         encoded.append(float(en.encode(outv)))
-        inpv=[0,0,0,0,1]
-    output_drugone.loc[j,"Drug Vector"]=' '.join(map(str,drugv))
+        inpv=unq
+    output_drugone.loc[j,"drug vector"]=' '.join(map(str,drugv))
     output_drugone.iloc[j,1:]=encoded
     drugv=cmb.combination(drugv)
     if drugv==False:
         break
     j=j+1
+
+print(output_drugone)
 
 #write to output_drugone.csv
 output_drugone.to_csv("outs/output_drugone.csv")

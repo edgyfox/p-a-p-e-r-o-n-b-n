@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Thu Feb  1 16:07:50 2018
+Created on Thu Mar 29 16:07:50 2018
 OBJECTIVE: DRUG VECTOR APPLICATION ON TWO FAULTS USING PARALLELISATION
 @author: arghanandan
 """
@@ -16,6 +16,7 @@ import numpy as np
 from pycuda import driver, compiler, gpuarray, tools
 import pycuda.autoinit
 
+#kernel code for parallel encoding
 kernel="""
 __global__ void encode(int *outv,float *env)
 {
@@ -42,45 +43,40 @@ pd.set_option("display.max_columns",None)
 pd.set_option("display.max_rows",None)
         
 #reading protein file
-df_gene=pd.read_csv("ins/gene.csv",
-                delimiter=",",
-                index_col=0,
-                header=None)
-df_gene.columns=["Proteins"]
-df_gene["Values"]=[0] * len(df_gene.index)
+inp=pd.read_csv("ins/inp.csv",delimiter=",",index_col=0)
+path=pd.read_csv("ins/path.csv",delimiter=",",index_col=0)
+out=pd.read_csv("ins/out.csv",delimiter=",",index_col=0)
+inp["values"]=[0]*len(inp.index)
+path["values"]=[0]*len(path.index)
+out["values"]=[0]*len(out.index)
 
 #reading drug file
 df_drug=pd.read_csv("ins/drug.csv",header=None)
 df_drug.columns=["Drugs"]
 
-#pathway and output dataframes
-out=pd.DataFrame(df_gene.iloc[28:,:]).reset_index()
-path=pd.DataFrame(df_gene.iloc[5:28,:]).reset_index()
-
-#input,pathway,output,encoded matrix for parallelised input
-f=open("outs/output_unq.txt","r")
-unq=f.readline()
-unq=unq.split(" ")
-inpv=list(map(int,unq))
-pathv=[0] * len(path)
-outv=[[0]*len(out)]*276
-env=[0] * 276
-     
 #creating output and fault file
 faultv=[]
 cols=["Drug Vector"]
 col=[]
-for i in range(1,25):
-    for j in range(i+1,25):
+for i in range(1,28):
+    for j in range(i+1,28):
         cols=cols+[str(i)+","+str(j)]
         faultv.append([i,j])
 output_drugtwo=pd.DataFrame(columns=cols)
 
 df_drug=pd.DataFrame(columns=df_drug.iloc[:,0])
 
+#input,pathway and output vectors
+f=open("outs/output_unq.txt","r")
+unq=f.readline()
+unq=list(map(int,unq.split(" ")))
+inpv=unq
+pathv=[0] * len(path.index)
+outv=[[0]*len(out.index)]*len(faultv)
+
 #creating drug file
 i=0
-drugv=[0,0,0,0,0,0]
+drugv=[0,0,0,0,0,0,0]
 while True:
     df_drug.loc[i]=drugv
     drugv=cmb.combination(drugv)
@@ -92,17 +88,17 @@ while True:
 drugv=(df_drug.as_matrix()).astype(np.int32)
 
 outsize=7
-thlen=276
+thlen=len(faultv)
 kernel=kernel % {"outsize":outsize}
 mod=compiler.SourceModule(kernel)
 results=mod.get_function("encode")
 for i  in range(len(drugv)):
     print "Drug vector:",i+1,drugv[i],"started."
     for j in range(len(faultv)):
-        outlist=[0,0,0,0,0,0,0]
+        outlist=[0]*len(out.index)
         drugpath.pathway(faultv[j],drugv[i],inpv,pathv,outlist)
         outv[j]=outlist
-        inpv=[0,0,0,0,1]
+        inpv=unq
     outv_gpu=gpuarray.to_gpu((np.array(outv)).astype(np.int32))
     env_gpu=gpuarray.empty((thlen),np.float32)
     results(outv_gpu,env_gpu,block=(thlen,1,1))

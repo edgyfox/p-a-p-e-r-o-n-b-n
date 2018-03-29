@@ -18,7 +18,7 @@ col_df=len(df_drugtwo.columns[1:])
 len_df=len(df_drugtwo.index)
 
 plt.figure()
-plt.imshow(df_drugtwo.iloc[:,1:],interpolation="sinc",cmap=plt.cm.RdYlGn_r)
+plt.imshow(df_drugtwo.iloc[:,1:],interpolation="nearest",cmap=plt.cm.RdYlGn_r)
 plt.axis("tight")
 plt.title("DRUG VECTORS V FAULT LOCATIONS\n" + ifile)
 plt.xticks([i for i in range(col_df)],df_drugtwo.columns[1:],rotation="vertical")

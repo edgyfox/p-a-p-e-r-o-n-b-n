@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Sat Jan  6 10:44:30 2018
+Created on Tue Mar 26 01:15:56 2018
 OBJECTIVE: INDUCE TWO FAULTS IN BOOLEAN NETWORK
 @author: arghanandan
 """
@@ -12,41 +12,31 @@ pd.set_option("display.max_columns",None)
 pd.set_option("display.max_rows",None)
 
 #reading protein file
-df=pd.read_csv("ins/gene.csv",
-                delimiter=",",
-                index_col=0,
-                header=None)
-
-df.columns=["Proteins"]
-
-inp=[]
-for i in range(35):
-    inp.append(0)
-df["Values"]=inp
-
-#pathway and output dataframes
-out=pd.DataFrame(df.iloc[28:,:]).reset_index()
-path=pd.DataFrame(df.iloc[5:28,:]).reset_index()
+inp=pd.read_csv("ins/inp.csv",delimiter=",",index_col=0)
+path=pd.read_csv("ins/path.csv",delimiter=",",index_col=0)
+out=pd.read_csv("ins/out.csv",delimiter=",",index_col=0)
+inp["values"]=[0]*len(inp.index)
+path["values"]=[0]*len(path.index)
+out["values"]=[0]*len(out.index)
 
 #input,pathway and output vectors
 f=open("outs/output_unq.txt","r")
 unq=f.readline()
-unq=unq.split(" ")
-inpv=list(map(int,unq))
-pathv=list(path["Values"])
-outv=list(out["Values"])
+unq=list(map(int,unq.split(" ")))
+inpv=unq
+pathv=list(path["values"])
+outv=list(out["values"])
 
-#output_single_fault dataframe
-output_2f=pd.DataFrame(columns=["Output Proteins"])
-output_2f["Output Proteins"]=out["Proteins"]
+#output_double_fault dataframe
+output_2f=pd.DataFrame(columns=["output proteins"])
+output_2f["output proteins"]=out["proteins"]
 
 #executing BN at ith gate
-for i in range(1,25):
-    for j in range(i,25):
-        if i!=j:
-            pth.pathway([i,j],inpv,pathv,outv)
-            output_2f[str(i)+","+str(j)]=outv
-            inpv=[0,0,0,0,1]
+for i in range(1,28):
+    for j in range(i+1,28):
+        pth.pathway([i,j],inpv,pathv,outv)
+        output_2f[str(i)+","+str(j)]=outv
+        inpv=unq
             
 #print(output_2f)
 
