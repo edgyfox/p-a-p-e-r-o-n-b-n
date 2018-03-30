@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Tue Mar 26 01:15:56 2018
-OBJECTIVE: INDUCE TWO FAULTS IN BOOLEAN NETWORK
+Created on Fri Mar 30 15:16:23 2018
+
 @author: arghanandan
 """
 
@@ -29,20 +29,20 @@ pathv=list(path["values"])
 outv=list(out["values"])
 
 #output_double_fault dataframe
-output_2f=pd.DataFrame(columns=["output proteins"])
-output_2f["output proteins"]=out["proteins"]
+output_3f=pd.DataFrame(columns=["output proteins"])
+output_3f["output proteins"]=out["proteins"]
 
 start_time=time.clock()
 #executing BN at ith gate
 for i in range(1,28):
     for j in range(i+1,28):
-        pth.pathway([i,j],inpv,pathv,outv)
-        output_2f[str(i)+","+str(j)]=outv
-        inpv=unq
-
+        for k in range(j+1,28):
+            pth.pathway([i,j,k],inpv,pathv,outv)
+            output_3f[str(i)+","+str(j)+","+str(k)]=outv
+            inpv=unq
+            
 print("Execution time: ","%0.3f"%(time.clock()-start_time)," seconds")
-           
-#print(output_2f)
+#print(output_3f)
 
 #write to .csv file   
-output_2f.to_csv("outs/output_2f.csv")
+output_3f.to_csv("outs/output_3f.csv")

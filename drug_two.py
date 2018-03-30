@@ -13,8 +13,6 @@ import encoder as en
 import matplotlib.pyplot as plt
 import time
 
-start_time=time.clock()
-
 #common settings
 plt.style.use("ggplot")
 pd.set_option("display.max_columns",None)
@@ -51,23 +49,26 @@ for i in range(1,28):
 output_drugtwo=pd.DataFrame(columns=cols)
 
 k=0
+start_time=time.clock()
 while True:
     output_drugtwo.loc[k,"Drug Vector"]=' '.join(map(str,drugv))
     l=1
+    print("Drug scenario:",drugv,"starts")
     for i in range(1,28):
         for j in range(i+1,28):
             drugpath.pathway([i,j],drugv,inpv,pathv,outv)
             inpv=unq
             output_drugtwo.iloc[k,l]=en.encode(outv)
             l=l+1
+    print("%0.3f"%(time.clock()-start_time),"Drug scenario:",drugv,"ends")
     drugv=cmb.combination(drugv)
     if drugv==False:
         break
     k=k+1
     
+print("Execution time: ","%0.3f"%(time.clock()-start_time)," seconds")
+
 #print(output_drugtwo)
 
 #write to outs/output_drugtwo.csv
 output_drugtwo.to_csv("outs/output_drugtwo.csv")
-      
-print("Execution time: ","%0.3f"%(time.clock()-start_time)," seconds")

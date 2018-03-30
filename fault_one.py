@@ -7,6 +7,7 @@ INDUCING SINGLE FAULTS IN BOOLEAN NETWORK
 """
 import pandas as pd
 import pathway_normal as pth
+import time
 pd.set_option("display.max_columns",None)
 pd.set_option("display.max_rows",None)
 
@@ -30,12 +31,16 @@ outv=list(out["values"])
 output_1f=pd.DataFrame(columns=["output proteins"])
 output_1f["output proteins"]=out["proteins"]
 
+start_time=time.clock()
+
 #executing BN at ith gate
-for i in range(28):
+for i in range(1,28):
     pth.pathway([i],inpv,pathv,outv)
     output_1f[str(i)]=outv
     inpv=[0,0,0,0,1]
     
+print("Execution time: ","%0.3f"%(time.clock()-start_time)," seconds")
+
 #print(output_1f)
 
 #write to .csv file   
